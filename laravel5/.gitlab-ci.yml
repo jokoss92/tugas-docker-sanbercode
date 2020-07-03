@@ -1,0 +1,21 @@
+image: php:7.2
+before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq git
+
+phpunit tests:
+  stage: test
+  script:
+  - curl -sS https://getcomposer.org/installer | php
+  - php composer.phar install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+  - cp .env.example .env
+  - php artisan key:generate
+  - vendor/bin/phpunit tests
+deploy to heroku:
+  stage: deploy
+  script:
+  - apt-get update -qq
+  - apt-get install -y -qq git
+  - apt-get install -y ruby
+  - gem install dpl
+  - dpl --provider=heroku --api-key=$HEROKU_API_KEY
